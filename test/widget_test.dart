@@ -7,13 +7,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:whatsapp_clone_py/features/data/datasources/auth_remote_data_source.dart';
+import 'package:whatsapp_clone_py/features/data/repositories/auth_repository_resigter_login.dart';
 
 import 'package:whatsapp_clone_py/main.dart';
 
 void main() {
+  final authRepositoryResigterLogin = AuthRepositoryResigterLogin(authRemoteDataSource: AuthRemoteDataSource());
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget( MyApp(authRepositoryResigterLogin: authRepositoryResigterLogin,));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
