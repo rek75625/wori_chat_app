@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // Open Messages page
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const MessagesPage()),
+      MaterialPageRoute(builder: (context) => const ChatPage()),
     );
   }
 
@@ -94,8 +94,8 @@ class _SplashScreenState extends State<SplashScreen> {
 // MESSAGES PAGE
 // ------------------------------------------------------
 
-class MessagesPage extends StatelessWidget {
-  const MessagesPage({super.key});
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
