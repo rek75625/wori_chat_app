@@ -8,11 +8,19 @@ class AuthRepositoryResigterLogin implements AuthRepository {
   new({required this.authRemoteDataSource});
   @override
   Future<UserEntity> login(String email, String password) async {
-   return await authRemoteDataSource.login(email: email, password: password);
+    return await authRemoteDataSource.login(email: email, password: password);
   }
 
   @override
-  Future<UserEntity> register(String username, String email, String password) async {
-  return await authRemoteDataSource.resgister(username: username, email: email, password: password);
+  Future<UserEntity> register(
+    String username,
+    String email,
+    String password,
+  ) async {
+    return await authRemoteDataSource.register(
+      username: username,
+      email: email,
+      password: password,
+    );
   }
 }

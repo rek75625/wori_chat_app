@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:whatsapp_clone_py/constants/theme.dart';
 import 'package:whatsapp_clone_py/features/data/datasources/auth_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/data/repositories/auth_repository_resigter_login.dart';
@@ -9,7 +10,6 @@ import 'package:whatsapp_clone_py/features/presentation/bloc/auth_bloc.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/chat_page.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/login_page.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/register_page.dart';
-import 'package:whatsapp_clone_py/features/presentation/pages/single_chat_page.dart';
 
 void main() {
   final authRepositoryResigterLogin = AuthRepositoryResigterLogin(
@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
             loginUseCase: LoginUseCase(
               authRepository: authRepositoryResigterLogin,
             ),
+            storage: const FlutterSecureStorage(),
           ),
         ),
       ],
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
 
-        home: SingleChatPage(),
+        home: RegisterPage(),
         routes: {
           "/login": (_) => LoginPage(),
           "/register": (_) => RegisterPage(),

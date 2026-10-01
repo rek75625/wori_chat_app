@@ -4,7 +4,7 @@ import 'package:whatsapp_clone_py/features/data/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteDataSource {
-  final String baseUrl = "http://localhost:6000/auth";
+  final String baseUrl = "http://localhost:5000/api/auth";
 
   Future<UserModel> login({
     required String email,
@@ -15,10 +15,13 @@ class AuthRemoteDataSource {
       body: jsonEncode({"email": email, "password": password}),
       headers: {"Content-Type": "application/json"},
     );
-    return UserModel.fromMap(jsonDecode(response.body));
+
+    // Fixed: Added ["user"] to safely extract the user object matching your Node backend
+    return UserModel.fromMap(jsonDecode(response.body)["user"]);
   }
 
-  Future<UserModel> resgister({
+  Future<UserModel> register({
+    // Fixed typo: changed 'resgister' to 'register'
     required String username,
     required String email,
     required String password,
