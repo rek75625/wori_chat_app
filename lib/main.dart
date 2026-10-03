@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Chat App',
+        title: 'Wori ChatApp',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
 
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
         routes: {
           "/login": (_) => LoginPage(),
           "/register": (_) => RegisterPage(),
-          "/chatpage": (_) => ConversationsPage(),
+          "/conversations": (_) => ConversationsPage(),
         },
       ),
     );
