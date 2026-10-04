@@ -66,7 +66,11 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 listener: (context, state) {
                   if (state is AuthSuccess) {
-                    Navigator.pushNamed(context, "/chatpage");
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      "/conversationsPage",
+                      (route) => false,
+                    );
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(state.error)));
@@ -75,7 +79,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               AppSizes.height24,
-              AuthPrompt(onTap: () {}, text: "Register"),
+              AuthPrompt(
+                onTap: () {
+                  Navigator.pushNamed(context, "/login");
+                },
+                text: "Register",
+              ),
             ],
           ),
         ),

@@ -84,7 +84,12 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
 
               AppSizes.height24,
-              AuthPrompt(onTap: () {}, text: "Login"),
+              AuthPrompt(
+                onTap: () {
+                  Navigator.pushNamed(context, "/register");
+                },
+                text: "Login",
+              ),
             ],
           ),
         ),

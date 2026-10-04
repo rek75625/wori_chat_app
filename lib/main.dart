@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
         routes: {
           "/login": (_) => LoginPage(),
           "/register": (_) => RegisterPage(),
-          "/conversations": (_) => ConversationsPage(),
+          "/conversationsPage": (_) => ConversationsPage(),
         },
       ),
     );
