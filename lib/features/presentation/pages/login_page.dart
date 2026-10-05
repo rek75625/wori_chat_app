@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
               AppSizes.height24,
               AuthPrompt(
                 onTap: () {
-                  Navigator.pushNamed(context, "/login");
+                  Navigator.pushNamed(context, "/register");
                 },
                 text: "Register",
               ),

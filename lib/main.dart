@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
 
-        home: ConversationsPage(),
+        home: RegisterPage(),
         routes: {
           "/login": (_) => LoginPage(),
           "/register": (_) => RegisterPage(),

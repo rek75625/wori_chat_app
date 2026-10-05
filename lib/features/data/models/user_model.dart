@@ -14,7 +14,9 @@ class UserModel extends UserEntity {
       // Fixed: Map 'username' from the backend payload, fallback to empty string if missing
       name: map['username'] ?? map['name'] ?? '',
       email: map['email'] ?? '',
-      token: map['token'], // Safely accepts null or string now without throwing a type crash
+      token:
+          map['token'] ??
+          "", // Safely accepts null or string now without throwing a type crash
     );
   }
 }
