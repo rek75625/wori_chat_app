@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:whatsapp_clone_py/constants/app_sizing.dart';
 import 'package:whatsapp_clone_py/constants/colors.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_event.dart';
 
-class SingleChatPage extends StatelessWidget {
-  const SingleChatPage({super.key});
+class ChatPage extends StatefulWidget {
+  final String conversationId;
+  const ChatPage({super.key, required this.conversationId});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  final TextEditingController _messageController = TextEditingController();
+  final _storage = FlutterSecureStorage();
+  String userId = "";
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<ChatBloc>(context)
+        .add(LoadMessagesEvent(conversationId: widget.conversationId));
+  }
 
   @override
   Widget build(BuildContext context) {

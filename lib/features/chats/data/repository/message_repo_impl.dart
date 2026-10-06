@@ -7,12 +7,12 @@ class MessageRepoImpl implements MessageRepository {
 
   MessageRepoImpl({required this.messagesRemoteDataSource});
   @override
-  Future<List<MessageEntity>> getFetchMessages(String conversationId) {
-    throw UnimplementedError();
+  Future<List<MessageEntity>> getFetchMessages(String conversationId) async {
+    return await messagesRemoteDataSource.fetchMessages(conversationId);
   }
 
   @override
-  Future<void> sendMessage(MessageEntity message) {
-    throw UnimplementedError();
+  Future<void> sendMessage(MessageEntity message) async {
+    // return await messagesRemoteDataSource.sendMessage(message);
   }
 }
