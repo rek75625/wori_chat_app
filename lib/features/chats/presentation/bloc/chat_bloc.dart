@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:whatsapp_clone_py/constants/socket_service.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/entities/message_entity.dart';
@@ -34,7 +35,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(ChatLoadedState(List.from(_messages)));
       _socketService.socket.emit("Joined Conversation", event.conversationId);
       _socketService.socket.on("new Message", (data) {
-        print("step1 - receive");
+        if (kDebugMode) {
+          print("step1 - receive");
+        }
       });
     } catch (e) {
       emit(ChatErrorState(error: e.toString()));
@@ -44,10 +47,31 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   Future<void> _onSendMessage(
     SendMessageEvent event,
     Emitter<ChatState> emit,
-  ) async {}
+  ) async {
+    String userId = await _storage.read(key: "userId") ?? "";
+    if (kDebugMode) {
+      print("userId: $userId");
+    }
+    final newMessage = {
+      "conversationId": event.conversationId,
+      "content": event.content,
+      "senderId": userId,
+    };
+    _socketService.socket.emit("sendMessage", newMessage);
+  }
 
   Future<void> _onReceiveMessage(
     ReceiveMessageEvent event,
     Emitter<ChatState> emit,
-  ) async {}
+  ) async {
+    final recMessage = MessageEntity(
+      id: event.message['id'],
+      conversationId: event.message['conversation_id'],
+      senderId: event.message['sender_id'],
+      content: event.message['content'],
+      createdAt: event.message['created_at'],
+    );
+    _messages.add(recMessage);
+    emit(ChatLoadedState(List.from(_messages)));
+  }
 }
