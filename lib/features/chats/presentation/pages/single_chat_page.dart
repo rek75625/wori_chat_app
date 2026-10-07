@@ -5,10 +5,12 @@ import 'package:whatsapp_clone_py/constants/app_sizing.dart';
 import 'package:whatsapp_clone_py/constants/colors.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_event.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_state.dart';
 
 class ChatPage extends StatefulWidget {
   final String conversationId;
-  const ChatPage({super.key, required this.conversationId});
+  final String mate;
+  const ChatPage({super.key, required this.conversationId, required this.mate});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -24,6 +26,32 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     BlocProvider.of<ChatBloc>(context)
         .add(LoadMessagesEvent(conversationId: widget.conversationId));
+    fetchUserId();
+  }
+
+  void fetchUserId() async {
+    userId = await _storage.read(key: 'userId') ?? '';
+    setState(() {
+      userId = userId;
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void sendMessage() {
+    final content = _messageController.text.trim();
+    if (content.isNotEmpty) {
+      BlocProvider.of<ChatBloc>(context).add(
+        SendMessageEvent(
+          conversationId: widget.conversationId,
+          content: content,
+        ),
+      );
+    }
   }
 
   @override
@@ -35,7 +63,7 @@ class _ChatPageState extends State<ChatPage> {
             // Avatar
             const CircleAvatar(radius: 25, backgroundColor: Color(0xFFD6E7F8)),
             const SizedBox(width: 12),
-            Text("AnyOne", style: Theme.of(context).textTheme.titleMedium),
+            Text(widget.mate, style: Theme.of(context).textTheme.titleMedium),
           ],
         ),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
@@ -43,16 +71,28 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              padding: AppSizes.padAll24,
-              children: [
-                _buildReceivedMessage(context, "Welcome to messages"),
-                _buildSentMessage(context, "Thank you"),
-                _buildReceivedMessage(context, "Welcome to messages"),
-                _buildSentMessage(context, "Thank you"),
-                _buildReceivedMessage(context, "Welcome to messages"),
-                _buildSentMessage(context, "Thank you"),
-              ],
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                if (state is ChatLoadingState) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is ChatLoadedState) {
+                  final messages = state.messages;
+                  return ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      final isSentByUser = message.senderId == userId;
+                      return isSentByUser
+                          ? _buildSentMessage(context, message.content)
+                          : _buildReceivedMessage(context, message.content);
+                    },
+                  );
+                } else if (state is ChatErrorState) {
+                  return Center(child: Text("Error: ${state.error}"));
+                } else {
+                  return Center(child: Text("Unknown state"));
+                }
+              },
             ),
           ),
           _buildMessageInput(context),

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// ignore: library_prefixes
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
@@ -23,10 +25,14 @@ class SocketService {
     );
     _socket.connect();
     _socket.onConnect((_) {
-      print('Connected to socket server');
+      if (kDebugMode) {
+        print('Connected to socket server');
+      }
     });
     _socket.onDisconnect((_) {
-      print('Disconnected from socket server');
+      if (kDebugMode) {
+        print('Disconnected from socket server');
+      }
     });
   }
 
