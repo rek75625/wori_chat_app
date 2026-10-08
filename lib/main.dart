@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:whatsapp_clone_py/constants/socket_service.dart';
 import 'package:whatsapp_clone_py/constants/theme.dart';
+import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote_data_source.dart';
+import 'package:whatsapp_clone_py/features/chats/data/repository/message_repo_impl.dart';
+import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_message_usecase.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/repositories/conversation_repo_impl.dart';
-import 'package:whatsapp_clone_py/features/conversations/domain/repositories/conversation_repo.dart';
+
 import 'package:whatsapp_clone_py/features/conversations/domain/usecases/conversation_usecase.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/pages/conversations_page.dart';
@@ -16,28 +21,39 @@ import 'package:whatsapp_clone_py/features/presentation/bloc/auth_bloc.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/login_page.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/register_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Initialize the service first
+  final socketService = SocketService();
+  await socketService.initialize();
   final authRepositoryResigterLogin = AuthRepositoryResigterLogin(
     authRemoteDataSource: AuthRemoteDataSource(),
   );
   final conversationRepoImpl = ConversationRepoImpl(
     remoteConversationSource: RemoteConversationSource(),
   );
+  final messageRepoImpl = MessageRepoImpl(
+    messagesRemoteDataSource: MessagesRemoteDataSource(),
+  );
   runApp(
     MyApp(
       authRepositoryResigterLogin: authRepositoryResigterLogin,
       repository: conversationRepoImpl,
+      messageRepository: messageRepoImpl,
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepositoryResigterLogin authRepositoryResigterLogin;
-  final ConversationRepository repository;
+  final ConversationRepoImpl repository;
+  final MessageRepoImpl messageRepository;
   const MyApp({
     super.key,
     required this.authRepositoryResigterLogin,
     required this.repository,
+    required this.messageRepository,
   });
 
   // This widget is the root of your application.
@@ -61,13 +77,20 @@ class MyApp extends StatelessWidget {
             fetchConversationUsecase: FetchConversationUsecase(repository),
           ),
         ),
+        BlocProvider(
+          create: (context) => ChatBloc(
+            fetchMessageUsecase: FetchMessageUsecase(
+              messageRepository: messageRepository,
+            ),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: 'Wori ChatApp',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
 
-        home: RegisterPage(),
+        home: LoginPage(),
         routes: {
           "/login": (_) => LoginPage(),
           "/register": (_) => RegisterPage(),

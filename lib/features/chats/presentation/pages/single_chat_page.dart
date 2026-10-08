@@ -18,40 +18,52 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  final _storage = FlutterSecureStorage();
+
+  final ScrollController _scrollController = ScrollController();
+
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
   String userId = "";
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<ChatBloc>(context)
-        .add(LoadMessagesEvent(conversationId: widget.conversationId));
-    fetchUserId();
+    _initialize();
   }
 
-  void fetchUserId() async {
-    userId = await _storage.read(key: 'userId') ?? '';
+  Future<void> _initialize() async {
+    final id = await _storage.read(key: 'userId');
+
+    if (!mounted) return;
+
     setState(() {
-      userId = userId;
+      userId = id ?? '';
     });
+
+    if (!mounted) return;
+
+    context.read<ChatBloc>().add(
+      LoadMessagesEvent(conversationId: widget.conversationId),
+    );
+  }
+
+  void sendMessage() {
+    final content = _messageController.text.trim();
+
+    if (content.isEmpty) return;
+
+    context.read<ChatBloc>().add(
+      SendMessageEvent(conversationId: widget.conversationId, content: content),
+    );
+
+    _messageController.clear();
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
-  }
-
-  void sendMessage() {
-    final content = _messageController.text.trim();
-    if (content.isNotEmpty) {
-      BlocProvider.of<ChatBloc>(context).add(
-        SendMessageEvent(
-          conversationId: widget.conversationId,
-          content: content,
-        ),
-      );
-    }
   }
 
   @override
@@ -81,7 +93,8 @@ class _ChatPageState extends State<ChatPage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isSentByUser = message.senderId == userId;
+                      final isSentByUser =
+                          message.senderId.toString() == userId;
                       return isSentByUser
                           ? _buildSentMessage(context, message.content)
                           : _buildReceivedMessage(context, message.content);
@@ -148,6 +161,7 @@ class _ChatPageState extends State<ChatPage> {
           AppSizes.width12,
           Expanded(
             child: TextFormField(
+              controller: _messageController,
               decoration: InputDecoration(
                 hintText: "Type here .....",
                 hintStyle: TextStyle(color: Colors.grey),
@@ -158,7 +172,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           AppSizes.height8,
           GestureDetector(
-            onTap: () {},
+            onTap: sendMessage,
             child: Icon(Icons.send, color: Colors.grey),
           ),
         ],

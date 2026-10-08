@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_clone_py/constants/app_sizing.dart';
 import 'package:whatsapp_clone_py/constants/colors.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/pages/single_chat_page.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_event.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_state.dart';
@@ -97,10 +98,25 @@ class _ConversationsPageState extends State<ConversationsPage> {
                       itemCount: state.conversations.length,
                       itemBuilder: (context, index) {
                         final conversation = state.conversations[index];
-                        return _messageTile(
-                          name: conversation.participantName,
-                          message: conversation.lastMessage,
-                          time: conversation.lastMessageTime.toString(),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return ChatPage(
+                                    conversationId: conversation.id,
+                                    mate: conversation.participantName,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          child: _messageTile(
+                            name: conversation.participantName,
+                            message: conversation.lastMessage,
+                            time: conversation.lastMessageTime.toString(),
+                          ),
                         );
                       },
                     );
