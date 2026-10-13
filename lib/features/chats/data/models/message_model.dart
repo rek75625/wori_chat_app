@@ -15,7 +15,11 @@ class MessageModel extends MessageEntity {
       conversationId: map['conversation_id'] ?? '',
       senderId: map['sender_id'] ?? '',
       content: map['content'] ?? '',
-      createdAt: DateTime.parse(map['created_at']),
+      createdAt: map['created_at'] is DateTime
+          ? map['created_at']
+          : DateTime.parse(
+              map['created_at'] ?? DateTime.now().toIso8601String(),
+            ),
     );
   }
 }

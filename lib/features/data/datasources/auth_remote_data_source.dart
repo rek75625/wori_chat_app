@@ -19,7 +19,10 @@ class AuthRemoteDataSource {
       headers: {"Content-Type": "application/json"},
     );
     String token = jsonDecode(response.body)["user"]["token"];
-    await _storage.write(key: "token", value: token);
+    await _storage.write(key: 'token', value: token);
+
+    String userid = jsonDecode(response.body)["user"]["id"].toString();
+    await _storage.write(key: 'userId', value: userid);
 
     // Fixed: Added ["user"] to safely extract the user object matching your Node backend
     return UserModel.fromMap(jsonDecode(response.body)["user"]);

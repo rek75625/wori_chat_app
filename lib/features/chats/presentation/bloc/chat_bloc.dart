@@ -30,13 +30,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final messages = await fetchMessageUsecase.callToGetMessages(
         event.conversationId,
       );
+
       _messages.clear();
       _messages.addAll(messages);
+
       emit(ChatLoadedState(List.from(_messages)));
-      _socketService.socket.emit("Joined Conversation", event.conversationId);
-      _socketService.socket.on("new Message", (data) {
-        if (kDebugMode) {
-          print("step1 - receive");
+
+      // 1. CLEAR ANY OLD EVENTS FIRST TO PREVENT MULTIPLE RESUBMISSIONS
+      _socketService.socket.off('receive_message');
+
+      // 2. Now join the room safely
+      _socketService.socket.emit('join_room', event.conversationId);
+
+      // 3. Register the clean listener
+      _socketService.socket.on('receive_message', (data) {
+        if (!isClosed) {
+          add(ReceiveMessageEvent(message: data));
         }
       });
     } catch (e) {
@@ -48,30 +57,62 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SendMessageEvent event,
     Emitter<ChatState> emit,
   ) async {
-    String userId = await _storage.read(key: "userId") ?? "";
-    if (kDebugMode) {
-      print("userId: $userId");
+    final userId = await _storage.read(key: 'userId');
+
+    if (userId == null || userId.isEmpty) {
+      debugPrint('Error: userId is missing.');
+      return;
     }
+
     final newMessage = {
-      "conversationId": event.conversationId,
-      "content": event.content,
-      "senderId": userId,
+      'conversationId': event.conversationId,
+      'senderId': userId,
+      'content': event.content,
     };
-    _socketService.socket.emit("sendMessage", newMessage);
+
+    debugPrint('Sending message: $newMessage');
+
+    _socketService.socket.emit('send_message', newMessage);
   }
 
   Future<void> _onReceiveMessage(
     ReceiveMessageEvent event,
     Emitter<ChatState> emit,
   ) async {
-    final recMessage = MessageEntity(
-      id: event.message['id'],
-      conversationId: event.message['conversation_id'],
-      senderId: event.message['sender_id'],
-      content: event.message['content'],
-      createdAt: event.message['created_at'],
-    );
-    _messages.add(recMessage);
-    emit(ChatLoadedState(List.from(_messages)));
+    // Safety check: Prevent emitting state if the Bloc or widget screen is closed
+    if (isClosed) return;
+
+    try {
+      final rawDate = event.message['created_at'];
+      DateTime parsedDate;
+
+      if (rawDate is DateTime) {
+        parsedDate = rawDate;
+      } else if (rawDate is String) {
+        parsedDate = DateTime.parse(rawDate);
+      } else {
+        parsedDate = DateTime.now();
+      }
+
+      final recMessage = MessageEntity(
+        id: event.message['id']?.toString() ?? '',
+        conversationId: event.message['conversation_id']?.toString() ?? '',
+        senderId: event.message['sender_id']?.toString() ?? '',
+        content: event.message['content']?.toString() ?? '',
+        createdAt: parsedDate,
+      );
+
+      _messages.add(recMessage);
+      emit(ChatLoadedState(List.from(_messages)));
+    } catch (e) {
+      debugPrint("Error parsing incoming message data: $e");
+    }
+  }
+
+  // ✅ Clean up socket listeners when user leaves the chat page
+  @override
+  Future<void> close() {
+    _socketService.socket.off('receive_message');
+    return super.close();
   }
 }

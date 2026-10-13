@@ -168,6 +168,11 @@ class _ChatPageState extends State<ChatPage> {
                 border: InputBorder.none,
               ),
               style: TextStyle(color: Colors.grey),
+              onFieldSubmitted: (value) {
+                if (value.isNotEmpty) {
+                  sendMessage();
+                }
+              },
             ),
           ),
           AppSizes.height8,
