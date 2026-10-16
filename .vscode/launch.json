@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Flutter Web (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome"
+    },
+    {
+      "name": "Flutter Mobile (Emulator)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "all" // Or replace "all" with your exact target device ID (e.g. "emulator-5554")
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All Platforms (Web & Mobile)",
+      "configurations": ["Flutter Web (Chrome)", "Flutter Mobile (Emulator)"]
+    }
+  ]
+}
