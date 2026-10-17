@@ -6,7 +6,8 @@ class FetchContactsUsecase {
 
   FetchContactsUsecase({required this.contactsRepository});
 
-  Future<List<ContactEntity>> callToGetContacts() async {
+  // Changing this to 'call' allows functional invocation shortcuts
+  Future<List<ContactEntity>> call() async {
     return await contactsRepository.fetchContacts();
   }
 }

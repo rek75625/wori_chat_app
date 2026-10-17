@@ -3,9 +3,9 @@ import 'package:whatsapp_clone_py/features/contacts/domain/repositories/contacts
 class AddContactsUsecase {
   final ContactsRepository contactsRepository;
 
-  AddContactsUsecase({required this.contactsRepository});
+  const AddContactsUsecase({required this.contactsRepository});
 
   Future<void> callToAddContacts({required String email}) async {
-    return contactsRepository.addContacts(email: email);
+    await contactsRepository.addContacts(email: email);
   }
 }

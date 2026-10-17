@@ -8,7 +8,7 @@ class ContactModel extends ContactEntity {
   });
   factory ContactModel.fromMap(Map<String, dynamic> map) {
     return ContactModel(
-      id: map['id'],
+      id: map['contact_id'],
       username: map['username'],
       email: map['email'],
     );

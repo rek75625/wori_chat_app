@@ -9,11 +9,23 @@ class ContactRepositoryImpl implements ContactsRepository {
 
   @override
   Future<void> addContacts({required String email}) async {
-    await contactRemoteDataSource.addContacts(email: email);
+    try {
+      await contactRemoteDataSource.addContacts(email: email);
+    } catch (e) {
+      // Catch the network/server error and throw a clear message
+      throw Exception("Failed to sync contact addition to server: $e");
+    }
   }
 
   @override
   Future<List<ContactEntity>> fetchContacts() async {
-    return await contactRemoteDataSource.fetchContacts();
+    try {
+      return await contactRemoteDataSource.fetchContacts();
+    } catch (e) {
+      // Return an empty list or throw a custom error instead of crashing the app
+      throw Exception(
+        "Failed to load your phonebook contacts from database: $e",
+      );
+    }
   }
 }

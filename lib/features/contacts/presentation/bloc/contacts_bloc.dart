@@ -23,11 +23,12 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
     Emitter<ContactsState> emit,
   ) async {
     emit(ContactsLoadingState());
+
     try {
-      final contacts = await fetchContactsUsecase.callToGetContacts();
+      final contacts = await fetchContactsUsecase.call();
       emit(ContactsLoadedState(contacts: contacts));
     } catch (e) {
-      emit(ContactsErrorState(message: "Failed to fetch contacts"));
+      emit(ContactsErrorState(message: "Failed to fetch contacts: $e"));
     }
   }
 
@@ -35,13 +36,22 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
     AddContactsEvent event,
     Emitter<ContactsState> emit,
   ) async {
+    // 1. Show a loading state on the screen while talking to the backend node server
     emit(ContactsLoadingState());
+
     try {
+      // 2. Perform the server write operation
       await addContactsUsecase.callToAddContacts(email: event.email);
+
+      // 3. Tell the listener that it succeeded (this triggers the green SnackBar)
       emit(ContactsAddedState());
+
+      // 4. THE FIX: Tell the bloc to cleanly fetch a fresh, updated list from scratch
       add(FetchContactsEvent());
     } catch (e) {
-      emit(ContactsErrorState(message: "Failed to fetch contacts"));
+      emit(
+        ContactsErrorState(message: e.toString().replaceAll("Exception: ", "")),
+      );
     }
   }
 }

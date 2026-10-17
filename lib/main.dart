@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:whatsapp_clone_py/constants/socket_service.dart';
 import 'package:whatsapp_clone_py/constants/theme.dart';
+
 import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/chats/data/repository/message_repo_impl.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_message_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
+
 import 'package:whatsapp_clone_py/features/contacts/data/datasource/contact_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/contacts/data/repositories/contact_repository_impl.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/add_contacts_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/fetch_contacts_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
+
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/repositories/conversation_repo_impl.dart';
-
 import 'package:whatsapp_clone_py/features/conversations/domain/usecases/conversation_usecase.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/pages/conversations_page.dart';
+
 import 'package:whatsapp_clone_py/features/data/datasources/auth_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/data/repositories/auth_repository_resigter_login.dart';
 import 'package:whatsapp_clone_py/features/domain/usecases/login_user_case.dart';
@@ -26,29 +30,39 @@ import 'package:whatsapp_clone_py/features/presentation/bloc/auth_bloc.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/login_page.dart';
 import 'package:whatsapp_clone_py/features/presentation/pages/register_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Initialize the service first
+  // Initialize the socket service.
+  // Ensure initialize() does not require a login token if called here.
   final socketService = SocketService();
   await socketService.initialize();
-  final authRepositoryResigterLogin = AuthRepositoryResigterLogin(
+
+  // Authentication dependencies.
+  final authRepository = AuthRepositoryResigterLogin(
     authRemoteDataSource: AuthRemoteDataSource(),
   );
-  final conversationRepoImpl = ConversationRepoImpl(
+
+  // Conversation dependencies.
+  final conversationRepository = ConversationRepoImpl(
     remoteConversationSource: RemoteConversationSource(),
   );
-  final messageRepoImpl = MessageRepoImpl(
+
+  // Message dependencies.
+  final messageRepository = MessageRepoImpl(
     messagesRemoteDataSource: MessagesRemoteDataSource(),
   );
+
+  // Contact dependencies.
   final contactsRepository = ContactRepositoryImpl(
     contactRemoteDataSource: ContactRemoteDataSource(),
   );
+
   runApp(
     MyApp(
-      authRepositoryResigterLogin: authRepositoryResigterLogin,
-      repository: conversationRepoImpl,
-      messageRepository: messageRepoImpl,
+      authRepositoryResigterLogin: authRepository,
+      repository: conversationRepository,
+      messageRepository: messageRepository,
       contactsRepository: contactsRepository,
     ),
   );
@@ -59,6 +73,7 @@ class MyApp extends StatelessWidget {
   final ConversationRepoImpl repository;
   final MessageRepoImpl messageRepository;
   final ContactRepositoryImpl contactsRepository;
+
   const MyApp({
     super.key,
     required this.authRepositoryResigterLogin,
@@ -67,13 +82,12 @@ class MyApp extends StatelessWidget {
     required this.contactsRepository,
   });
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc(
+          create: (_) => AuthBloc(
             registerUseCase: RegisterUseCase(
               authRepository: authRepositoryResigterLogin,
             ),
@@ -84,19 +98,19 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) => ConversationsBloc(
+          create: (_) => ConversationsBloc(
             fetchConversationUsecase: FetchConversationUsecase(repository),
           ),
         ),
         BlocProvider(
-          create: (context) => ChatBloc(
+          create: (_) => ChatBloc(
             fetchMessageUsecase: FetchMessageUsecase(
               messageRepository: messageRepository,
             ),
           ),
         ),
         BlocProvider(
-          create: (context) => ContactsBloc(
+          create: (_) => ContactsBloc(
             fetchContactsUsecase: FetchContactsUsecase(
               contactsRepository: contactsRepository,
             ),
@@ -110,12 +124,11 @@ class MyApp extends StatelessWidget {
         title: 'Wori ChatApp',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-
-        home: LoginPage(),
+        home: const LoginPage(),
         routes: {
-          "/login": (_) => LoginPage(),
-          "/register": (_) => RegisterPage(),
-          "/conversationsPage": (_) => ConversationsPage(),
+          '/login': (_) => const LoginPage(),
+          '/register': (_) => const RegisterPage(),
+          '/conversationsPage': (_) => const ConversationsPage(),
         },
       ),
     );
