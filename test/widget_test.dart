@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/chats/data/repository/message_repo_impl.dart';
+import 'package:whatsapp_clone_py/features/contacts/data/datasource/contact_remote_data_source.dart';
+import 'package:whatsapp_clone_py/features/contacts/data/repositories/contact_repository_impl.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/repositories/conversation_repo_impl.dart';
 import 'package:whatsapp_clone_py/features/data/datasources/auth_remote_data_source.dart';
@@ -26,6 +28,9 @@ void main() {
   final messageRepoImpl = MessageRepoImpl(
     messagesRemoteDataSource: MessagesRemoteDataSource(),
   );
+  final contactsRepository = ContactRepositoryImpl(
+    contactRemoteDataSource: ContactRemoteDataSource(),
+  );
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
@@ -33,6 +38,7 @@ void main() {
         authRepositoryResigterLogin: authRepositoryResigterLogin,
         repository: conversationRepoImpl,
         messageRepository: messageRepoImpl,
+        contactsRepository: contactsRepository,
       ),
     );
 

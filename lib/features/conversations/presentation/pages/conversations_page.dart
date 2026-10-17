@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_clone_py/constants/app_sizing.dart';
 import 'package:whatsapp_clone_py/constants/colors.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/pages/single_chat_page.dart';
+import 'package:whatsapp_clone_py/features/contacts/presentation/pages/contacts_page.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_event.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_state.dart';
@@ -139,6 +140,15 @@ class _ConversationsPageState extends State<ConversationsPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ContactsPage()),
+          );
+        },
+        child: Icon(Icons.contacts),
       ),
     );
   }

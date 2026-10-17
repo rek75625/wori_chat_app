@@ -7,6 +7,11 @@ import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote
 import 'package:whatsapp_clone_py/features/chats/data/repository/message_repo_impl.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_message_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
+import 'package:whatsapp_clone_py/features/contacts/data/datasource/contact_remote_data_source.dart';
+import 'package:whatsapp_clone_py/features/contacts/data/repositories/contact_repository_impl.dart';
+import 'package:whatsapp_clone_py/features/contacts/domain/usecases/add_contacts_usecase.dart';
+import 'package:whatsapp_clone_py/features/contacts/domain/usecases/fetch_contacts_usecase.dart';
+import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/repositories/conversation_repo_impl.dart';
 
@@ -36,11 +41,15 @@ void main() async {
   final messageRepoImpl = MessageRepoImpl(
     messagesRemoteDataSource: MessagesRemoteDataSource(),
   );
+  final contactsRepository = ContactRepositoryImpl(
+    contactRemoteDataSource: ContactRemoteDataSource(),
+  );
   runApp(
     MyApp(
       authRepositoryResigterLogin: authRepositoryResigterLogin,
       repository: conversationRepoImpl,
       messageRepository: messageRepoImpl,
+      contactsRepository: contactsRepository,
     ),
   );
 }
@@ -49,11 +58,13 @@ class MyApp extends StatelessWidget {
   final AuthRepositoryResigterLogin authRepositoryResigterLogin;
   final ConversationRepoImpl repository;
   final MessageRepoImpl messageRepository;
+  final ContactRepositoryImpl contactsRepository;
   const MyApp({
     super.key,
     required this.authRepositoryResigterLogin,
     required this.repository,
     required this.messageRepository,
+    required this.contactsRepository,
   });
 
   // This widget is the root of your application.
@@ -81,6 +92,16 @@ class MyApp extends StatelessWidget {
           create: (context) => ChatBloc(
             fetchMessageUsecase: FetchMessageUsecase(
               messageRepository: messageRepository,
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => ContactsBloc(
+            fetchContactsUsecase: FetchContactsUsecase(
+              contactsRepository: contactsRepository,
+            ),
+            addContactsUsecase: AddContactsUsecase(
+              contactsRepository: contactsRepository,
             ),
           ),
         ),
