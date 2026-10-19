@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whatsapp_clone_py/features/chats/presentation/pages/single_chat_page.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_event.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_state.dart';
@@ -30,87 +31,121 @@ class _ContactsPageState extends State<ContactsPage> {
         elevation: 0,
       ),
       // FIX: Changed BlocBuilder to BlocConsumer to listen to non-visual side-effects
-      body: BlocConsumer<ContactsBloc, ContactsState>(
+      body: BlocListener<ContactsBloc, ContactsState>(
         listener: (context, state) {
-          if (state is ContactsAddedState) {
-            // Show successful confirmation snackbar automatically
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Contact added successfully!"),
-                backgroundColor: Colors.green,
+          if (state is ConversationReadyState) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                  conversationId: state.conversationId,
+                  mate: state.contactName,
+                ),
               ),
             );
+          } else if (state is ContactsAddedState) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Contact added successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
           } else if (state is ContactsErrorState) {
-            // Show error message if duplicate, non-existent, or self-addition
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
           }
         },
-        buildWhen: (previous, current) {
-          // Only re-build list UI layout if we hit specific visual structural states
-          return current is ContactsLoadingState ||
-              current is ContactsLoadedState ||
-              current is ContactsErrorState;
-        },
-        builder: (context, state) {
-          if (state is ContactsLoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        child: BlocBuilder<ContactsBloc, ContactsState>(
+          buildWhen: (previous, current) {
+            return current is ContactsLoadingState ||
+                current is ContactsLoadedState ||
+                current is ContactsErrorState;
+          },
+          builder: (context, state) {
+            // Loading indicator
+            if (state is ContactsLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (state is ContactsLoadedState) {
-            if (state.contacts.isEmpty) {
+            // Display contacts
+            if (state is ContactsLoadedState) {
+              if (state.contacts.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'Your contact list is empty.\n'
+                    "Try adding a registered user's email!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: state.contacts.length,
+                itemBuilder: (context, index) {
+                  final contact = state.contacts[index];
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          contact.username.isNotEmpty
+                              ? contact.username[0].toUpperCase()
+                              : '?',
+                        ),
+                      ),
+                      title: Text(
+                        contact.username,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        contact.email,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      trailing: const Icon(Icons.chat, color: Colors.green),
+                      onTap: () {
+                        context.read<ContactsBloc>().add(
+                          CheckOrCreateCoversationEvent(
+                            contactId: contact.id,
+                            contactName: contact.username,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            }
+
+            // Error UI
+            if (state is ContactsErrorState) {
               return const Center(
                 child: Text(
-                  "Your contact list is empty.\nTry adding a registered user's email!",
+                  'Unable to load contacts. Please try again.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                  style: TextStyle(color: Colors.red, fontSize: 16),
                 ),
               );
             }
 
-            return ListView.builder(
-              itemCount: state.contacts.length,
-              itemBuilder: (context, index) {
-                final contact = state.contacts[index];
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        contact.username.isNotEmpty
-                            ? contact.username[0].toUpperCase()
-                            : "?",
-                      ),
-                    ),
-                    title: Text(
-                      contact.username,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      contact.email,
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    trailing: const Icon(Icons.chat, color: Colors.green),
-                    onTap: () {
-                      Navigator.pop(context, contact);
-                    },
-                  ),
-                );
-              },
+            // Initial or fallback UI
+            return const Center(
+              child: Text('Load contacts to start chatting.'),
             );
-          }
-
-          // Fallback UI view safe tracking handles
-          return const Center(child: Text("Load contacts to start chat."));
-        },
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddContactDialog,

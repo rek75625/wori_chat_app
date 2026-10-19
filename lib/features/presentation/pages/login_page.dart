@@ -57,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _passwordController,
                 isPassword: true,
               ),
+              AppSizes.height24,
               BlocConsumer<AuthBloc, AuthState>(
                 builder: (context, state) {
                   if (state is AuthLoading) {

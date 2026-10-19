@@ -40,4 +40,30 @@ class RemoteConversationSource {
       throw Exception("Failed to fetch conversations: ${response.statusCode}");
     }
   }
+
+  Future<String> checkOrCreateConversations({required String contactId}) async {
+    final token = await _storage.read(key: "token") ?? "";
+    log(
+      "Sending Token to Server: Bearer $token",
+    ); // Debug to ensure token isn't blank
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/conversations/check-or_create"),
+      body: jsonEncode({'contactId': contactId}),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      return data['conversationId'];
+    } else {
+      log(
+        "Failed to fetch conversations: ${response.statusCode} - Body: ${response.body}",
+      );
+      throw Exception("Failed to fetch conversations: ${response.statusCode}");
+    }
+  }
 }

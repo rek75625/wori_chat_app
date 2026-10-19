@@ -4,16 +4,22 @@ class ConversationModel extends ConversationEntity {
   ConversationModel({
     required super.id,
     required super.participantName,
-    required super.lastMessage,
-    required super.lastMessageTime,
+    super.lastMessage, // ✅ Allowed to be null or optional
+    super.lastMessageTime, // ✅ Allowed to be null or optional
   });
 
   factory ConversationModel.fromMap(Map<String, dynamic> map) {
     return ConversationModel(
-      id: map['conversation_id'] ?? '',
-      participantName: map['participant_name'] ?? '',
-      lastMessage: map['last_message'] ?? '',
-      lastMessageTime: DateTime.parse(map['last_message_time']),
+      id: map['conversation_id']?.toString() ?? '',
+      participantName: map['participant_name']?.toString() ?? 'Unknown User',
+
+      // ✅ Null-safe fallback: If no messages exist yet, use placeholder string
+      lastMessage: map['last_message']?.toString() ?? 'No messages yet',
+
+      // ✅ Null-safe conditional date parsing: Prevent DateTime.parse(null) crash
+      lastMessageTime: map['last_message_time'] != null
+          ? DateTime.parse(map['last_message_time'].toString())
+          : null,
     );
   }
 }

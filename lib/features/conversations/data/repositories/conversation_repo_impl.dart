@@ -10,4 +10,11 @@ class ConversationRepoImpl extends ConversationRepository {
   Future<List<ConversationEntity>> getConversations() async {
     return await remoteConversationSource.toGetConversations();
   }
+
+  @override
+  Future<String> checkOrCreateConversation({required String contactId}) async {
+    return await remoteConversationSource.checkOrCreateConversations(
+      contactId: contactId,
+    );
+  }
 }

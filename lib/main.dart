@@ -18,6 +18,7 @@ import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_b
 
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
 import 'package:whatsapp_clone_py/features/conversations/data/repositories/conversation_repo_impl.dart';
+import 'package:whatsapp_clone_py/features/conversations/domain/usecases/check_or_create_conversation_usecase.dart';
 import 'package:whatsapp_clone_py/features/conversations/domain/usecases/conversation_usecase.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/pages/conversations_page.dart';
@@ -61,7 +62,7 @@ Future<void> main() async {
   runApp(
     MyApp(
       authRepositoryResigterLogin: authRepository,
-      repository: conversationRepository,
+      coversationrepository: conversationRepository,
       messageRepository: messageRepository,
       contactsRepository: contactsRepository,
     ),
@@ -70,14 +71,14 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   final AuthRepositoryResigterLogin authRepositoryResigterLogin;
-  final ConversationRepoImpl repository;
+  final ConversationRepoImpl coversationrepository;
   final MessageRepoImpl messageRepository;
   final ContactRepositoryImpl contactsRepository;
 
   const MyApp({
     super.key,
     required this.authRepositoryResigterLogin,
-    required this.repository,
+    required this.coversationrepository,
     required this.messageRepository,
     required this.contactsRepository,
   });
@@ -99,7 +100,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => ConversationsBloc(
-            fetchConversationUsecase: FetchConversationUsecase(repository),
+            fetchConversationUsecase: FetchConversationUsecase(
+              coversationrepository,
+            ),
           ),
         ),
         BlocProvider(
@@ -116,6 +119,9 @@ class MyApp extends StatelessWidget {
             ),
             addContactsUsecase: AddContactsUsecase(
               contactsRepository: contactsRepository,
+            ),
+            conversationUseCase: CheckOrCreateConversationUseCase(
+              conversationRepository: coversationrepository,
             ),
           ),
         ),

@@ -115,8 +115,11 @@ class _ConversationsPageState extends State<ConversationsPage> {
                           },
                           child: _messageTile(
                             name: conversation.participantName,
-                            message: conversation.lastMessage,
-                            time: conversation.lastMessageTime.toString(),
+                            message:
+                                conversation.lastMessage ?? 'No messages yet',
+                            time: conversation.lastMessageTime != null
+                                ? "${conversation.lastMessageTime!.hour}:${conversation.lastMessageTime!.minute}"
+                                : 'New', // ✅ Clean fallback if no messages exist yet
                           ),
                         );
                       },

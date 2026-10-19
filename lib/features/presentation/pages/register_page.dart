@@ -66,6 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _passwordController,
                 isPassword: true,
               ),
+              AppSizes.height24,
               BlocConsumer<AuthBloc, AuthState>(
                 builder: (context, state) {
                   if (state is AuthLoading) {

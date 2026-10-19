@@ -36,7 +36,7 @@ void main() {
     await tester.pumpWidget(
       MyApp(
         authRepositoryResigterLogin: authRepositoryResigterLogin,
-        repository: conversationRepoImpl,
+        coversationrepository: conversationRepoImpl,
         messageRepository: messageRepoImpl,
         contactsRepository: contactsRepository,
       ),

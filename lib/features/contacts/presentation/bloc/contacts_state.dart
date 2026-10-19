@@ -27,3 +27,12 @@ class ContactsErrorState extends ContactsState {
 class ContactsAddedState extends ContactsState {
   const ContactsAddedState();
 }
+
+class ConversationReadyState extends ContactsState {
+  final String conversationId;
+  final String contactName;
+  const ConversationReadyState({
+    required this.conversationId,
+    required this.contactName,
+  });
+}

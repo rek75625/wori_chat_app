@@ -70,8 +70,16 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: DefaultColors.messageListPage,
         flexibleSpace: Row(
           children: [
+            IconButton(
+              onPressed: () {
+                // Navigator.canPop(context);
+              },
+              icon: Icon(Icons.arrow_back, color: Colors.grey),
+            ),
             // Avatar
             const CircleAvatar(radius: 25, backgroundColor: Color(0xFFD6E7F8)),
             const SizedBox(width: 12),
