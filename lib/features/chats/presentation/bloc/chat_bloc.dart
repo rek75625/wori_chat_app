@@ -109,7 +109,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
-  // ✅ Clean up socket listeners when user leaves the chat page
+  // Clean up socket listeners when user leaves the chat page
   @override
   Future<void> close() {
     _socketService.socket.off('receive_message');

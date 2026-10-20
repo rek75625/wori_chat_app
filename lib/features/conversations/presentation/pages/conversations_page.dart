@@ -27,19 +27,37 @@ class _ConversationsPageState extends State<ConversationsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF111827),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111827),
+        // 1. Completely hide the default framework back arrow override
+        automaticallyImplyLeading: false,
+        backgroundColor: DefaultColors.messageListPage,
         elevation: 0,
-        title: const Text(
-          'Messages',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+
+        // 2. Put the action arrow in its dedicated semantic slot
+        leading: IconButton(
+          onPressed: () {
+            // Instantly pops the current screen context and navigates backward safely
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.grey),
         ),
+
+        // 3. Move the profile layout information cleanly into the title widget
+        title: Text(
+          'Messages',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            overflow: TextOverflow.ellipsis, // Prevents text crashing into search icon if name is long
+          ),
+        ),
+
+        // 4. Actions remain securely positioned on the right-hand layout margin
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.search, color: Colors.white),
+            icon: const Icon(Icons.search, color: Colors.grey),
           ),
         ],
       ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

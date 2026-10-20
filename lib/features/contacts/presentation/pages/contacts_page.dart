@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whatsapp_clone_py/constants/colors.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/pages/single_chat_page.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_event.dart';
@@ -26,15 +27,26 @@ class _ContactsPageState extends State<ContactsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Contacts"),
-        backgroundColor: Colors.transparent,
+        // 1. Completely hide the default framework back arrow override
+        automaticallyImplyLeading: false,
+        backgroundColor: DefaultColors.messageListPage,
         elevation: 0,
+
+        // 2. Put the action arrow in its dedicated semantic slot
+        leading: IconButton(
+          onPressed: () {
+            // Instantly pops the current screen context and navigates backward safely
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
       ),
       // FIX: Changed BlocBuilder to BlocConsumer to listen to non-visual side-effects
       body: BlocListener<ContactsBloc, ContactsState>(
-        listener: (context, state) {
+        listener: (context, state) async {
+          final contactsBloc = BlocProvider.of<ContactsBloc>(context);
           if (state is ConversationReadyState) {
-            Navigator.push(
+            var res = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ChatPage(
@@ -43,6 +55,9 @@ class _ContactsPageState extends State<ContactsPage> {
                 ),
               ),
             );
+            if (res == null) {
+              contactsBloc.add(FetchContactsEvent());
+            }
           } else if (state is ContactsAddedState) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()

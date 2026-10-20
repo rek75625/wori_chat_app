@@ -70,23 +70,50 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // 1. Completely hide the default framework back arrow override
         automaticallyImplyLeading: false,
         backgroundColor: DefaultColors.messageListPage,
-        flexibleSpace: Row(
+        elevation: 0,
+
+        // 2. Put the action arrow in its dedicated semantic slot
+        leading: IconButton(
+          onPressed: () {
+            // Instantly pops the current screen context and navigates backward safely
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+
+        // 3. Move the profile layout information cleanly into the title widget
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              onPressed: () {
-                // Navigator.canPop(context);
-              },
-              icon: Icon(Icons.arrow_back, color: Colors.grey),
-            ),
             // Avatar
-            const CircleAvatar(radius: 25, backgroundColor: Color(0xFFD6E7F8)),
+            const CircleAvatar(
+              radius: 20, // Slightly resized to look balanced inside standard AppBar heights
+              backgroundColor: Color(0xFFD6E7F8),
+            ),
             const SizedBox(width: 12),
-            Text(widget.mate, style: Theme.of(context).textTheme.titleMedium),
+
+            // Participant Profile Name
+            Expanded(
+              child: Text(
+                widget.mate,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  overflow: TextOverflow.ellipsis, // Prevents text crashing into search icon if name is long
+                ),
+              ),
+            ),
           ],
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
+
+        // 4. Actions remain securely positioned on the right-hand layout margin
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search, color: Colors.grey),
+          ),
+        ],
       ),
       body: Column(
         children: [

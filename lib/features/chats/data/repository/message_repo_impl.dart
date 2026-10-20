@@ -1,4 +1,5 @@
 import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote_data_source.dart';
+import 'package:whatsapp_clone_py/features/chats/domain/entities/daily_questions_entity.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/entities/message_entity.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/repository/message_repo.dart';
 
@@ -14,5 +15,11 @@ class MessageRepoImpl implements MessageRepository {
   @override
   Future<void> sendMessage(MessageEntity message) async {
     // return await messagesRemoteDataSource.sendMessage(message);
+  }
+
+  @override
+  Future<DailyQuestionsEntity> dailyQuestions(String content) {
+    // TODO: implement dailyQuestions
+    throw UnimplementedError();
   }
 }
