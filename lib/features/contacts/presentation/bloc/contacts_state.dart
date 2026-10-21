@@ -30,9 +30,9 @@ class ContactsAddedState extends ContactsState {
 
 class ConversationReadyState extends ContactsState {
   final String conversationId;
-  final String contactName;
+  final ContactEntity contact;
   const ConversationReadyState({
     required this.conversationId,
-    required this.contactName,
+    required this.contact,
   });
 }

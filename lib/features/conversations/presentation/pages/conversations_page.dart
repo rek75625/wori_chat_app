@@ -117,6 +117,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
                       itemCount: state.conversations.length,
                       itemBuilder: (context, index) {
                         final conversation = state.conversations[index];
+
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -126,6 +127,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
                                   return ChatPage(
                                     conversationId: conversation.id,
                                     mate: conversation.participantName,
+                                    profileImage: conversation.participantImage,
                                   );
                                 },
                               ),
@@ -133,11 +135,12 @@ class _ConversationsPageState extends State<ConversationsPage> {
                           },
                           child: _messageTile(
                             name: conversation.participantName,
+                            image: conversation.participantImage,
                             message:
                                 conversation.lastMessage ?? 'No messages yet',
                             time: conversation.lastMessageTime != null
                                 ? "${conversation.lastMessageTime!.hour}:${conversation.lastMessageTime!.minute}"
-                                : 'New', // ✅ Clean fallback if no messages exist yet
+                                : 'New',
                           ),
                         );
                       },
@@ -176,6 +179,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
 
   Widget _messageTile({
     required String name,
+    required String image,
     required String message,
     required String time,
   }) {
@@ -187,7 +191,10 @@ class _ConversationsPageState extends State<ConversationsPage> {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: const CircleAvatar(
+        leading: CircleAvatar(
+          backgroundImage: image.isNotEmpty
+              ? NetworkImage(image)
+              : NetworkImage("https://placehold.co/600x400/png"),
           radius: 24,
           backgroundColor: Color(0xFFD6E7F8),
         ),

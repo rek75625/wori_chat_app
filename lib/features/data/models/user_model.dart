@@ -5,7 +5,8 @@ class UserModel extends UserEntity {
     required super.id,
     required super.name,
     required super.email,
-    super.token, // Fixed: Removed 'required' to allow it to pass null safely
+    super.token,
+    required super.profileImage,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -14,9 +15,8 @@ class UserModel extends UserEntity {
       // Fixed: Map 'username' from the backend payload, fallback to empty string if missing
       name: map['username'] ?? map['name'] ?? '',
       email: map['email'] ?? '',
-      token:
-          map['token'] ??
-          "", // Safely accepts null or string now without throwing a type crash
+      token: map['token'] ?? "",
+      profileImage: map['profile_mage'] ?? "https://placehold.co/600x400/png",
     );
   }
 }

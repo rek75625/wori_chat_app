@@ -18,8 +18,7 @@ class MessageRepoImpl implements MessageRepository {
   }
 
   @override
-  Future<DailyQuestionsEntity> dailyQuestions(String content) {
-    // TODO: implement dailyQuestions
-    throw UnimplementedError();
+  Future<DailyQuestionsEntity> dailyQuestions(String conversationId) async {
+    return await messagesRemoteDataSource.fetchDailyQuestions(conversationId);
   }
 }

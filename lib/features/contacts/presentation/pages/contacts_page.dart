@@ -51,7 +51,8 @@ class _ContactsPageState extends State<ContactsPage> {
               MaterialPageRoute(
                 builder: (context) => ChatPage(
                   conversationId: state.conversationId,
-                  mate: state.contactName,
+                  mate: state.contact.username,
+                  profileImage: state.contact.profileImage,
                 ),
               ),
             );
@@ -134,7 +135,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         context.read<ContactsBloc>().add(
                           CheckOrCreateCoversationEvent(
                             contactId: contact.id,
-                            contactName: contact.username,
+                            contact: contact,
                           ),
                         );
                       },

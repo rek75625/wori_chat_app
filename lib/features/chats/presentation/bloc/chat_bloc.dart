@@ -1,24 +1,31 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:whatsapp_clone_py/constants/socket_service.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/entities/message_entity.dart';
+import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_daily_questions_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_message_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_event.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final FetchMessageUsecase fetchMessageUsecase;
+  final FetchDailyQuestionsUsecase fetchDailyQuestionsUsecase;
   final SocketService _socketService = SocketService();
   final List<MessageEntity> _messages = [];
   final _storage = FlutterSecureStorage();
 
-  ChatBloc({required this.fetchMessageUsecase}) : super(ChatLoadingState()) {
+  ChatBloc({
+    required this.fetchMessageUsecase,
+    required this.fetchDailyQuestionsUsecase,
+  }) : super(ChatLoadingState()) {
     on<LoadMessagesEvent>(_onLoadMessages);
     on<SendMessageEvent>(_onSendMessage);
     on<ReceiveMessageEvent>(_onReceiveMessage);
+    on<LoadDailyQuestionsEvent>(_onLoadDailyQuestionsEvent);
   }
 
   Future<void> _onLoadMessages(
@@ -105,7 +112,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       _messages.add(recMessage);
       emit(ChatLoadedState(List.from(_messages)));
     } catch (e) {
-      debugPrint("Error parsing incoming message data: $e");
+      log("Error parsing incoming message data: $e");
     }
   }
 
@@ -114,5 +121,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   Future<void> close() {
     _socketService.socket.off('receive_message');
     return super.close();
+  }
+
+  Future<void> _onLoadDailyQuestionsEvent(
+    LoadDailyQuestionsEvent event,
+    Emitter<ChatState> emit,
+  ) async {
+    try {
+      emit(ChatLoadingState());
+      final dailyQuestion = await fetchDailyQuestionsUsecase
+          .callToGetDailyQuestions(event.conversationId);
+      emit(ChatDailyQuestionsLoadedState(dailyQuestion: dailyQuestion));
+    } catch (e) {
+      log("Error parsing daily questions: $e");
+    }
   }
 }

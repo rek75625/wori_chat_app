@@ -71,7 +71,7 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
       emit(
         ConversationReadyState(
           conversationId: conversationId,
-          contactName: event.contactName,
+          contact: event.contact,
         ),
       );
     } catch (e) {

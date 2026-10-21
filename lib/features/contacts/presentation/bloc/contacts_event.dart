@@ -1,3 +1,5 @@
+import 'package:whatsapp_clone_py/features/contacts/domain/entities/contact_entity.dart';
+
 abstract class ContactsEvent {
   const ContactsEvent();
 }
@@ -8,10 +10,10 @@ class FetchContactsEvent extends ContactsEvent {
 
 class CheckOrCreateCoversationEvent extends ContactsEvent {
   final String contactId;
-  final String contactName;
+  final ContactEntity contact;
   const CheckOrCreateCoversationEvent({
     required this.contactId,
-    required this.contactName,
+    required this.contact,
   });
 }
 

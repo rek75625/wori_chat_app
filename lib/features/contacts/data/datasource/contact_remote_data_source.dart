@@ -75,4 +75,30 @@ class ContactRemoteDataSource {
       return "Server error payload parsing failed.";
     }
   }
+
+  Future<List<ContactModel>> fetchRecentContacts() async {
+    final token = await _storage.read(key: "token") ?? "";
+
+    try {
+      final response = await http
+          .get(
+            Uri.parse("$baseUrl/contacts/recent"),
+            headers: {
+              "Authorization": "Bearer $token",
+              "Content-Type": "application/json",
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        // FIX 2: Extract clean error message strings from backend response text bodies
+        // final errorMsg = _extractBackendError(response.body);
+
+        List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => ContactModel.fromMap(e)).toList();
+      }
+    } catch (e) {
+      throw Exception(e.toString().replaceAll("Exception: ", ""));
+    }
+  }
 }

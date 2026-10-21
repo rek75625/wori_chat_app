@@ -10,7 +10,14 @@ import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_state.da
 class ChatPage extends StatefulWidget {
   final String conversationId;
   final String mate;
-  const ChatPage({super.key, required this.conversationId, required this.mate});
+  final String profileImage;
+
+  const ChatPage({
+    super.key,
+    required this.conversationId,
+    required this.mate,
+    required this.profileImage,
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -24,6 +31,7 @@ class _ChatPageState extends State<ChatPage> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   String userId = "";
+  String botId = "00000000-0000-0000-0000-000000000000";
 
   @override
   void initState() {
@@ -44,6 +52,9 @@ class _ChatPageState extends State<ChatPage> {
 
     context.read<ChatBloc>().add(
       LoadMessagesEvent(conversationId: widget.conversationId),
+    );
+    context.read<ChatBloc>().add(
+      LoadDailyQuestionsEvent(conversationId: widget.conversationId),
     );
   }
 
@@ -89,9 +100,10 @@ class _ChatPageState extends State<ChatPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Avatar
-            const CircleAvatar(
+            CircleAvatar(
               radius: 20, // Slightly resized to look balanced inside standard AppBar heights
               backgroundColor: Color(0xFFD6E7F8),
+              backgroundImage: NetworkImage(widget.profileImage),
             ),
             const SizedBox(width: 12),
 
@@ -130,8 +142,15 @@ class _ChatPageState extends State<ChatPage> {
                       final message = messages[index];
                       final isSentByUser =
                           message.senderId.toString() == userId;
+                      final isDailyQuestion =
+                          message.senderId.toString() == botId;
                       return isSentByUser
                           ? _buildSentMessage(context, message.content)
+                          : isDailyQuestion
+                          ? _buildDailyQuestionsMessage(
+                              context,
+                              message.content,
+                            )
                           : _buildReceivedMessage(context, message.content);
                     },
                   );
@@ -216,6 +235,25 @@ class _ChatPageState extends State<ChatPage> {
             child: Icon(Icons.send, color: Colors.grey),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDailyQuestionsMessage(BuildContext context, String content) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(right: 30, top: 5, bottom: 5),
+        padding: AppSizes.padAll16,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        child: Text(
+          "🧠 Daily Questions : $content",
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: Colors.white70),
+        ),
       ),
     );
   }

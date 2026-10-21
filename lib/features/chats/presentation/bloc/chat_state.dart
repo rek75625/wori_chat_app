@@ -1,3 +1,4 @@
+import 'package:whatsapp_clone_py/features/chats/domain/entities/daily_questions_entity.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/entities/message_entity.dart';
 
 abstract class ChatState {}
@@ -14,4 +15,10 @@ class ChatErrorState extends ChatState {
   final String error;
 
   ChatErrorState({required this.error});
+}
+
+class ChatDailyQuestionsLoadedState extends ChatState {
+  final DailyQuestionsEntity dailyQuestion;
+
+  ChatDailyQuestionsLoadedState({required this.dailyQuestion});
 }

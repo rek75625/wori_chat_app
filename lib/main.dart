@@ -7,6 +7,7 @@ import 'package:whatsapp_clone_py/constants/theme.dart';
 
 import 'package:whatsapp_clone_py/features/chats/data/datasource/messages_remote_data_source.dart';
 import 'package:whatsapp_clone_py/features/chats/data/repository/message_repo_impl.dart';
+import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_daily_questions_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/domain/usecases/fetch_message_usecase.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/bloc/chat_bloc.dart';
 
@@ -108,6 +109,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => ChatBloc(
             fetchMessageUsecase: FetchMessageUsecase(
+              messageRepository: messageRepository,
+            ),
+            fetchDailyQuestionsUsecase: FetchDailyQuestionsUsecase(
               messageRepository: messageRepository,
             ),
           ),

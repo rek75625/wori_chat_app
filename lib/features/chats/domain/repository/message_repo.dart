@@ -4,5 +4,5 @@ import 'package:whatsapp_clone_py/features/chats/domain/entities/message_entity.
 abstract class MessageRepository {
   Future<List<MessageEntity>> getFetchMessages(String conversationId);
   Future<void> sendMessage(MessageEntity message);
-  Future<DailyQuestionsEntity> dailyQuestions(String content);
+  Future<DailyQuestionsEntity> dailyQuestions(String conversationId);
 }
