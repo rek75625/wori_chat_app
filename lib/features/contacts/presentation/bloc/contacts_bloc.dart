@@ -3,23 +3,28 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/add_contacts_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/fetch_contacts_usecase.dart';
+import 'package:whatsapp_clone_py/features/contacts/domain/usecases/recent_contact_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_event.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_state.dart';
 import 'package:whatsapp_clone_py/features/conversations/domain/usecases/check_or_create_conversation_usecase.dart';
+import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_state.dart';
 
 class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
   final FetchContactsUsecase fetchContactsUsecase;
   final AddContactsUsecase addContactsUsecase;
   final CheckOrCreateConversationUseCase conversationUseCase;
+  final RecentContactUsecase recentContactUsecase;
 
   ContactsBloc({
     required this.fetchContactsUsecase,
     required this.addContactsUsecase,
     required this.conversationUseCase,
+    required this.recentContactUsecase,
   }) : super(ContactsInitialState()) {
     on<FetchContactsEvent>(_onFetchContactsEvent);
     on<AddContactsEvent>(_onAddContactsEvent);
     on<CheckOrCreateCoversationEvent>(_onCheckOrCreateCoversationEvent);
+    on<LoadRecentContactsEvent>(_onLoadRecentContactsEvent);
   }
 
   Future<void> _onFetchContactsEvent(
@@ -78,6 +83,19 @@ class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
       emit(
         ContactsErrorState(message: e.toString().replaceAll("Exception: ", "")),
       );
+    }
+  }
+
+  Future<void> _onLoadRecentContactsEvent(
+    LoadRecentContactsEvent event,
+    Emitter<ContactsState> emit,
+  ) async {
+    emit(ContactsLoadingState());
+    try {
+      final recentContacts = await recentContactUsecase.callGetRecentContacts();
+      emit(RecentContactsLoadedState(recentContacts: recentContacts));
+    } catch (e) {
+      emit(ContactsErrorState(message: "Failed to fetch recent Contacts"));
     }
   }
 }

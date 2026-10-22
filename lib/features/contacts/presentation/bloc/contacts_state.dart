@@ -36,3 +36,9 @@ class ConversationReadyState extends ContactsState {
     required this.contact,
   });
 }
+
+class RecentContactsLoadedState extends ContactsState {
+  final List<ContactEntity> recentContacts;
+
+  RecentContactsLoadedState({required this.recentContacts});
+}

@@ -22,3 +22,5 @@ class AddContactsEvent extends ContactsEvent {
 
   const AddContactsEvent({required this.email});
 }
+
+class LoadRecentContactsEvent extends ContactsEvent {}

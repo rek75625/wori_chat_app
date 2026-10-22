@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_clone_py/constants/app_sizing.dart';
 import 'package:whatsapp_clone_py/constants/colors.dart';
 import 'package:whatsapp_clone_py/features/chats/presentation/pages/single_chat_page.dart';
+import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
+import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_event.dart';
+import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_state.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/pages/contacts_page.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_bloc.dart';
 import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_event.dart';
@@ -20,7 +23,8 @@ class _ConversationsPageState extends State<ConversationsPage> {
   void initState() {
     super.initState();
     BlocProvider.of<ConversationsBloc>(context).add(GetConversationsEvent());
-    BlocProvider.of<ConversationsBloc>(context).add(LoadRecentContactsEvent());
+    BlocProvider.of<ContactsBloc>(context).add(LoadRecentContactsEvent());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
   }
 
   @override
@@ -71,7 +75,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
             ),
           ),
           const SizedBox(height: 10),
-          BlocBuilder<ConversationsBloc, ConversationsState>(
+          BlocBuilder<ContactsBloc, ContactsState>(
             builder: (context, state) {
               if (state is RecentContactsLoadedState) {
                 if (state.recentContacts.isEmpty) {
@@ -82,21 +86,23 @@ class _ConversationsPageState extends State<ConversationsPage> {
                     ),
                   );
                 }
-                return ListView.builder(
-                  itemCount: state.recentContacts.length,
-                  itemBuilder: (context, index) {
-                    final recentContact = state.recentContacts[index];
+                return Container(
+                  height: 90, // Increased slightly to prevent any potential text clipping
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: state.recentContacts.length,
+                    itemBuilder: (context, index) {
+                      final recentContact = state.recentContacts[index];
 
-                    return Container(
-                      height: 90, // Increased slightly to prevent any potential text clipping
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: _statusTile(
+                      return _statusTile(
                         context,
                         recentContact.username,
                         recentContact.profileImage,
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 );
               } else if (state is ConversationsError) {
                 return const Center(
