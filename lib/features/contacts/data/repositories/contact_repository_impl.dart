@@ -28,4 +28,16 @@ class ContactRepositoryImpl implements ContactsRepository {
       );
     }
   }
+
+  @override
+  Future<List<ContactEntity>> getRecentContacts() async {
+    try {
+      return await contactRemoteDataSource.fetchRecentContacts();
+    } catch (e) {
+      // Return an empty list or throw a custom error instead of crashing the app
+      throw Exception(
+        "Failed to load your phonebook contacts from database: $e",
+      );
+    }
+  }
 }

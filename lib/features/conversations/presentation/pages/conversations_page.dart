@@ -20,6 +20,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
   void initState() {
     super.initState();
     BlocProvider.of<ConversationsBloc>(context).add(GetConversationsEvent());
+    BlocProvider.of<ConversationsBloc>(context).add(LoadRecentContactsEvent());
   }
 
   @override
@@ -70,22 +71,48 @@ class _ConversationsPageState extends State<ConversationsPage> {
             ),
           ),
           const SizedBox(height: 10),
-          Container(
-            height:
-                90, // Increased slightly to prevent any potential text clipping
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _statusTile(name: "Berry"),
-                _statusTile(name: "Verry"),
-                _statusTile(name: "Gerry"),
-                _statusTile(name: "Jerry"),
-                _statusTile(name: "Aerry"),
-                _statusTile(name: "Merry"),
-                _statusTile(name: "Perry"),
-              ],
-            ),
+          BlocBuilder<ConversationsBloc, ConversationsState>(
+            builder: (context, state) {
+              if (state is RecentContactsLoadedState) {
+                if (state.recentContacts.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No conversations found",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: state.recentContacts.length,
+                  itemBuilder: (context, index) {
+                    final recentContact = state.recentContacts[index];
+
+                    return Container(
+                      height: 90, // Increased slightly to prevent any potential text clipping
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: _statusTile(
+                        context,
+                        recentContact.username,
+                        recentContact.profileImage,
+                      ),
+                    );
+                  },
+                );
+              } else if (state is ConversationsError) {
+                return const Center(
+                  child: Text(
+                    "Something went wrong",
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                );
+              }
+              return const Center(
+                child: Text(
+                  "No conversations found",
+                  style: TextStyle(color: Colors.white70),
+                ),
+              );
+            },
           ),
 
           AppSizes.height24,
@@ -145,6 +172,8 @@ class _ConversationsPageState extends State<ConversationsPage> {
                         );
                       },
                     );
+                  } else if (state is ConversationsLoading) {
+                    return Center(child: CircularProgressIndicator());
                   } else if (state is ConversationsError) {
                     return const Center(
                       child: Text(
@@ -221,13 +250,17 @@ class _ConversationsPageState extends State<ConversationsPage> {
     );
   }
 
-  Widget _statusTile({required String name}) {
+  Widget _statusTile(BuildContext context, String name, String profileImage) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min, // Takes up only required space
         children: [
-          const CircleAvatar(radius: 25, backgroundColor: Color(0xFFD6E7F8)),
+          CircleAvatar(
+            radius: 25,
+            backgroundColor: Color(0xFFD6E7F8),
+            child: Image.network(profileImage),
+          ),
           const SizedBox(height: 8),
           Text(
             name,

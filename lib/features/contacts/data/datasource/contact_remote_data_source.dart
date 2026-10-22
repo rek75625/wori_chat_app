@@ -96,6 +96,8 @@ class ContactRemoteDataSource {
 
         List<dynamic> data = jsonDecode(response.body);
         return data.map((e) => ContactModel.fromMap(e)).toList();
+      } else {
+        throw Exception("Exception: Failed to fetch recent contacts ");
       }
     } catch (e) {
       throw Exception(e.toString().replaceAll("Exception: ", ""));

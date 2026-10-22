@@ -15,6 +15,7 @@ import 'package:whatsapp_clone_py/features/contacts/data/datasource/contact_remo
 import 'package:whatsapp_clone_py/features/contacts/data/repositories/contact_repository_impl.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/add_contacts_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/domain/usecases/fetch_contacts_usecase.dart';
+import 'package:whatsapp_clone_py/features/contacts/domain/usecases/recent_contact_usecase.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_bloc.dart';
 
 import 'package:whatsapp_clone_py/features/conversations/data/datasources/remote_conversation_source.dart';
@@ -103,6 +104,9 @@ class MyApp extends StatelessWidget {
           create: (_) => ConversationsBloc(
             fetchConversationUsecase: FetchConversationUsecase(
               coversationrepository,
+            ),
+            recentContactUsecase: RecentContactUsecase(
+              contactsRepository: contactsRepository,
             ),
           ),
         ),

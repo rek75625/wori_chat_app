@@ -3,4 +3,6 @@ import 'package:whatsapp_clone_py/features/contacts/domain/entities/contact_enti
 abstract class ContactsRepository {
   Future<List<ContactEntity>> fetchContacts();
   Future<void> addContacts({required String email});
+
+  Future<List<ContactEntity>> getRecentContacts();
 }
