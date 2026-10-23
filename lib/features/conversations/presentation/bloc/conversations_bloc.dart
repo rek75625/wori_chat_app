@@ -34,7 +34,7 @@ class ConversationsBloc extends Bloc<ConversationsEvent, ConversationsState> {
 
   void _initializeSocketListeners() {
     try {
-      _socketService.socket.on('conversationUpdates', (data) {
+      _socketService.socket.on('conversationUpdates', (dynamic data) {
         if (!isClosed) {
           add(GetConversationsEvent());
         }

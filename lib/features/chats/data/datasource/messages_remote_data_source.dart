@@ -34,7 +34,7 @@ class MessagesRemoteDataSource {
   Future<DailyQuestionsModel> fetchDailyQuestions(String conversationId) async {
     final token = await _storage.read(key: "token") ?? "";
     final response = await http.get(
-      Uri.parse("$baseUrl/conversations/$conversationId/daily-question"),
+      Uri.parse("$baseUrl/api/conversations/$conversationId/daily-question"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",

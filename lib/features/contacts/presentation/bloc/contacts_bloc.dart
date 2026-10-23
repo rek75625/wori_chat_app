@@ -7,7 +7,6 @@ import 'package:whatsapp_clone_py/features/contacts/domain/usecases/recent_conta
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_event.dart';
 import 'package:whatsapp_clone_py/features/contacts/presentation/bloc/contacts_state.dart';
 import 'package:whatsapp_clone_py/features/conversations/domain/usecases/check_or_create_conversation_usecase.dart';
-import 'package:whatsapp_clone_py/features/conversations/presentation/bloc/conversations_state.dart';
 
 class ContactsBloc extends Bloc<ContactsEvent, ContactsState> {
   final FetchContactsUsecase fetchContactsUsecase;
